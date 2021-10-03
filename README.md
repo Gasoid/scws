@@ -33,6 +33,11 @@ The main purpose of the project is to develop static server that can be used wit
 **Jaeger lib has more variables.** Please check its github readme https://github.com/jaegertracing/jaeger-client-go
 
 
+## Useful URLS
+- /_/health
+- /_/metrics
+
+
 ## Docker image
 ```bash
 docker pull ghcr.io/gasoid/scws:latest

@@ -28,7 +28,7 @@ services:
       JAEGER_SERVICE_NAME: "scws"
       #JAEGER_REPORTER_LOG_SPANS: true
       SCWS_INDEXHTML: "calculator/index.html"
-      SCWS_S3_BUCKET: "scoutbeemedia"
+      SCWS_S3_BUCKET: ""
       SCWS_S3_PREFIX: "/"
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
