@@ -1,0 +1,33 @@
+# Static Content Web Server
+The main purpose of the project is to develop static server that can be used with modern javascript frameworks (React, vue.js and so on)
+
+
+### Features:
+- Jaeger support
+- Prometeus metrics
+
+
+### Storage types:
+- local filesystem
+- aws s3
+
+
+## Variables
+
+| Variable Name  | Description |
+| ------------- | ------------- |
+| SCWS_INDEXHTML | index file (default: "/index.html") |
+| SCWS_STORAGE | storage type: filesystem, s3 (default: "filesystem") |
+| SCWS_PORT | port (default: "8080") |
+| SCWS_FS_ROOT | root path for filesystem (default: "/www/") |
+| SCWS_S3_BUCKET | s3 bucket where content is |
+| SCWS_S3_PREFIX | s3 prefix where content is (default: "") |
+| AWS_ACCESS_KEY_ID | please set up AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY and AWS_REGION if storage type is "s3" |
+| AWS_SECRET_ACCESS_KEY |  |
+| AWS_REGION | REGION |
+| JAEGER_AGENT_HOST | jaeger host (default: "localhost") |
+| JAEGER_AGENT_PORT | jaeger port (default: "6831") |
+| JAEGER_TAGS | jaeger tags (default: "") |
+| JAEGER_SERVICE_NAME | jaeger service name (default: "") |
+
+**Jaeger lib has more variables.** Please check its github readme https://github.com/jaegertracing/jaeger-client-go
