@@ -16,7 +16,7 @@ type Config struct {
 	Port      string `default:"8080"`
 	Domain    string
 	Storage   string `default:"filesystem"`
-	IndexHtml string `default:"index.html"`
+	IndexHtml string `default:"index.html" name:"index_html"`
 }
 
 // FsConfig configures Fs storage
@@ -26,8 +26,11 @@ type FsConfig struct {
 
 // S3Config configures S3 storage
 type S3Config struct {
-	Bucket string `default:""`
-	Prefix string `default:"/"`
+	Bucket             string `default:""`
+	Prefix             string `default:"/"`
+	AwsAccessKeyID     string `name:"Aws_Access_Key_ID"`
+	AwsSecretAccessKey string `name:"Aws_Secret_Access_Key"`
+	AwsRegion          string `name:"Aws_Region"`
 }
 
 func New() *Config {
@@ -43,12 +46,20 @@ func getEnvVar(name string, prefix string) string {
 	return os.Getenv(fmt.Sprintf("SCWS_%s%s", prefix, strings.ToUpper(name)))
 }
 
-func (c *FsConfig) ParseEnv() error {
+type config interface {
+	ParseEnv() error
+}
+
+func parseEnv(c config, prefix string) error {
 	t := reflect.ValueOf(c).Elem()
 	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
 		typeField := t.Type().Field(i)
-		value := getEnvVar(typeField.Name, "FS")
+		envName := typeField.Tag.Get("name")
+		if envName == "" {
+			envName = typeField.Name
+		}
+		value := getEnvVar(envName, prefix)
 		if value == "" {
 			tagValue := typeField.Tag.Get(tagName)
 			if tagValue != "" {
@@ -60,44 +71,18 @@ func (c *FsConfig) ParseEnv() error {
 		f.Set(reflect.ValueOf(value))
 	}
 	return nil
+}
+
+func (c *FsConfig) ParseEnv() error {
+	return parseEnv(c, "FS")
 }
 
 func (c *S3Config) ParseEnv() error {
-	t := reflect.ValueOf(c).Elem()
-	for i := 0; i < t.NumField(); i++ {
-		f := t.Field(i)
-		typeField := t.Type().Field(i)
-		value := getEnvVar(typeField.Name, "S3")
-		if value == "" {
-			tagValue := typeField.Tag.Get(tagName)
-			if tagValue != "" {
-				tag := strings.TrimSpace(tagValue)
-				value = tag
-			}
-
-		}
-		f.Set(reflect.ValueOf(value))
-	}
-	return nil
+	return parseEnv(c, "S3")
 }
 
 func (c *Config) ParseEnv() error {
-	t := reflect.ValueOf(c).Elem()
-	for i := 0; i < t.NumField(); i++ {
-		f := t.Field(i)
-		typeField := t.Type().Field(i)
-		value := getEnvVar(typeField.Name, "")
-		if value == "" {
-			tagValue := typeField.Tag.Get(tagName)
-			if tagValue != "" {
-				tag := strings.TrimSpace(tagValue)
-				value = tag
-			}
-
-		}
-		f.Set(reflect.ValueOf(value))
-	}
-	return nil
+	return parseEnv(c, "")
 }
 
 func (c *Config) GetAddr() string {

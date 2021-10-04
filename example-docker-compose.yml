@@ -27,12 +27,12 @@ services:
       JAEGER_TAGS: "service=frontend"
       JAEGER_SERVICE_NAME: "scws"
       #JAEGER_REPORTER_LOG_SPANS: true
-      SCWS_INDEXHTML: "calculator/index.html"
+      SCWS_INDEX_HTML: "calculator/index.html"
       SCWS_S3_BUCKET: "scoutbeemedia"
       SCWS_S3_PREFIX: "/"
-      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
-      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
-      AWS_REGION: "eu-west-1"
+      SCWS_S3_AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      SCWS_S3_AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+      SCWS_S3_AWS_REGION: "eu-west-1"
       SCWS_STORAGE: "filesystem"
     ports:
       - "8080:8080"
