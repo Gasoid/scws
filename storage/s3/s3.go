@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"path"
 	"scws/common/config"
 
@@ -30,10 +29,10 @@ func New(c *config.Config) (*S3Storage, error) {
 		AuthMethod: awss3.AuthAccessKey,
 		Bucket:     s.config.Bucket,
 		Settings:   make(gou.JsonHelper),
-		Region:     os.Getenv("AWS_REGION"),
+		Region:     s3Config.AwsRegion,
 	}
-	conf.Settings[awss3.ConfKeyAccessKey] = os.Getenv("AWS_ACCESS_KEY_ID")
-	conf.Settings[awss3.ConfKeyAccessSecret] = os.Getenv("AWS_SECRET_ACCESS_KEY")
+	conf.Settings[awss3.ConfKeyAccessKey] = s3Config.AwsAccessKeyID
+	conf.Settings[awss3.ConfKeyAccessSecret] = s3Config.AwsSecretAccessKey
 	store, err := cloudstorage.NewStore(conf)
 	if err != nil {
 		log.Println("s3.New", err.Error())
