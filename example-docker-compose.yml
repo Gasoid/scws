@@ -19,7 +19,7 @@ services:
   scws:
     depends_on:
       - jaeger
-    image: scws:check
+    image: scws:all
     environment:
       JAEGER_AGENT_HOST: "jaeger"
       JAEGER_AGENT_PORT: 6831
@@ -28,7 +28,7 @@ services:
       JAEGER_SERVICE_NAME: "scws"
       #JAEGER_REPORTER_LOG_SPANS: true
       SCWS_INDEX_HTML: "calculator/index.html"
-      SCWS_S3_BUCKET: "scoutbeemedia"
+      SCWS_S3_BUCKET: ""
       SCWS_S3_PREFIX: "/"
       SCWS_S3_AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
       SCWS_S3_AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"

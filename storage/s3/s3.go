@@ -92,6 +92,10 @@ func (s *S3Storage) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.FileServer(o).ServeHTTP(w, r)
 }
 
+func (s *S3Storage) ServeFile(w http.ResponseWriter, r *http.Request, filePath string) {
+	http.ServeFile(w, r, filePath)
+}
+
 func (s *S3Storage) newObject() *object {
 	return &object{
 		prefix: s.config.Prefix,

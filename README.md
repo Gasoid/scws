@@ -22,7 +22,7 @@ The main purpose of the project is to develop static server that can be used wit
 | SCWS_FS_ROOT | root path for filesystem (default: "/www/") |
 | SCWS_S3_BUCKET | s3 bucket where content is |
 | SCWS_S3_PREFIX | s3 prefix where content is (default: "") |
-| SCWS_S3_AWS_ACCESS_KEY_ID | please set up AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY and AWS_REGION if storage type is "s3" |
+| SCWS_S3_AWS_ACCESS_KEY_ID | please set up SCWS_S3_AWS_ACCESS_KEY_ID, SCWS_S3_AWS_SECRET_ACCESS_KEY and AWS_REGION if storage type is "s3" |
 | SCWS_S3_AWS_SECRET_ACCESS_KEY |  |
 | SCWS_S3_AWS_REGION | REGION |
 | JAEGER_AGENT_HOST | jaeger host (default: "localhost") |

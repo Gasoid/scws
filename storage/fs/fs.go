@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"path"
 	"scws/common/config"
 )
 
@@ -59,6 +60,11 @@ func (s *FSStorage) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		index: s.index,
 	}
 	http.FileServer(dir).ServeHTTP(w, r)
+}
+
+func (s *FSStorage) ServeFile(w http.ResponseWriter, r *http.Request, filePath string) {
+	filePath = path.Join(s.config.Root, filePath)
+	http.ServeFile(w, r, filePath)
 }
 
 func (s *FSStorage) GetName() string {

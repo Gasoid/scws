@@ -6,6 +6,7 @@ import (
 	"scws/common/config"
 	"scws/storage/fs"
 	"scws/storage/s3"
+	"strings"
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
@@ -20,6 +21,7 @@ const (
 type IStorage interface {
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 	GetName() string
+	ServeFile(w http.ResponseWriter, r *http.Request, filePath string)
 }
 
 type Storage struct {
@@ -58,9 +60,10 @@ func (s *Storage) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		span.SetTag("http.url", r.URL.Path)
 		span.SetTag("storage", s.storage.GetName())
 	}
-	// if strings.HasSuffix(r.URL.Path, "/") || r.URL.Path == "/" {
-	// 	r.URL.Path = s.config.IndexHtml
-	// }
-	s.storage.ServeHTTP(w, r)
+	if strings.HasSuffix(r.URL.Path, "/") || r.URL.Path == "/" {
+		s.storage.ServeFile(w, r, s.config.IndexHtml)
+	} else {
+		s.storage.ServeHTTP(w, r)
+	}
 	log.Println(r.URL.Path, r.RemoteAddr, w.Header().Get("status"))
 }
