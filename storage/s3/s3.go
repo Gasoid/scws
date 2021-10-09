@@ -20,6 +20,13 @@ const (
 func New(c *config.Config) (*S3Storage, error) {
 	s3Config := config.S3Config{}
 	s3Config.ParseEnv()
+	if c.IsVaultEnabled() {
+		err := s3Config.GetVaultSecrets(c.VaultPaths)
+		if err != nil {
+			log.Println("s3.New", err)
+			return nil, err
+		}
+	}
 	s := S3Storage{
 		config: &s3Config,
 	}
@@ -93,7 +100,7 @@ func (s *S3Storage) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *S3Storage) ServeFile(w http.ResponseWriter, r *http.Request, filePath string) {
-	http.ServeFile(w, r, filePath)
+	s.ServeHTTP(w, r)
 }
 
 func (s *S3Storage) newObject() *object {

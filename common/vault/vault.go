@@ -8,6 +8,10 @@ import (
 	"github.com/hashicorp/vault/api"
 )
 
+var (
+	vaultClient *api.Client
+)
+
 // renewToken is intended to renew token
 func renewToken(client *api.Client) {
 	token := client.Auth().Token()
@@ -39,33 +43,39 @@ func renewToken(client *api.Client) {
 	}
 }
 
-func VaultInit(address, path, token string) error {
+func Init(address, token string) error {
 	client, err := api.NewClient(&api.Config{
 		Address: address,
 	})
+	vaultClient = client
 	if err != nil {
 		log.Println("Can't connect to vault: ", err.Error())
 		return err
 	}
-	client.SetToken(token)
-	// vault = &vaultServer{
-	// 	client: client,
-	// }
-	secret, err := client.Logical().Read(path)
+	vaultClient.SetToken(token)
+
+	go renewToken(vaultClient)
+
+	return nil
+}
+
+func GetSecrets(path string) (map[string]string, error) {
+	secretMap := map[string]string{}
+	secret, err := vaultClient.Logical().Read(path)
 	if err != nil {
 		log.Println("Can't pull secrets: ", err.Error())
-		return err
+		return nil, err
 	}
 	if secret == nil {
-		return errors.New("secret data doesn't exist")
+		return nil, errors.New("secret data doesn't exist")
 	}
-	data := secret.Data["data"].(map[string]interface{})
-	go renewToken(client)
-	if data != nil {
-		return nil
-	}
-	// for k, v := range data {
-	// 	envVars.secrets[k] = v.(string)
+	// if secret.Renewable {
+	// 	api.
 	// }
-	return nil
+	data := secret.Data["data"].(map[string]interface{})
+
+	for k, v := range data {
+		secretMap[k] = v.(string)
+	}
+	return secretMap, nil
 }

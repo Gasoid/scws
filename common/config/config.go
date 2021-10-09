@@ -2,21 +2,27 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"reflect"
+	"scws/common/vault"
 	"strings"
 )
 
 const (
-	tagName = "default"
+	tagName      = "default"
+	varNameTempl = "SCWS_%s%s"
 )
 
 // Config configures scws
 type Config struct {
-	Port      string `default:"8080"`
-	Domain    string
-	Storage   string `default:"filesystem"`
-	IndexHtml string `default:"index.html" name:"index_html"`
+	Port         string `default:"8080"`
+	Domain       string
+	Storage      string `default:"filesystem"`
+	IndexHtml    string `default:"index.html" name:"index_html"`
+	VaultAddress string `name:"vault_address"`
+	VaultToken   string `name:"vault_token"`
+	VaultPaths   string `name:"vault_paths"`
 }
 
 // FsConfig configures Fs storage
@@ -28,14 +34,21 @@ type FsConfig struct {
 type S3Config struct {
 	Bucket             string `default:""`
 	Prefix             string `default:"/"`
-	AwsAccessKeyID     string `name:"Aws_Access_Key_ID"`
-	AwsSecretAccessKey string `name:"Aws_Secret_Access_Key"`
+	AwsAccessKeyID     string `name:"Aws_Access_Key_ID" vault:"enabled" vault_alt_key:"access_key"`
+	AwsSecretAccessKey string `name:"Aws_Secret_Access_Key" vault:"enabled" vault_alt_key:"secret_key"`
 	AwsRegion          string `name:"Aws_Region"`
 }
 
 func New() *Config {
 	c := Config{}
 	c.ParseEnv()
+
+	if c.IsVaultEnabled() {
+		err := vault.Init(c.VaultAddress, c.VaultToken)
+		if err != nil {
+			log.Println("config.New", err.Error())
+		}
+	}
 	return &c
 }
 
@@ -43,7 +56,7 @@ func getEnvVar(name string, prefix string) string {
 	if prefix != "" {
 		prefix = prefix + "_"
 	}
-	return os.Getenv(fmt.Sprintf("SCWS_%s%s", prefix, strings.ToUpper(name)))
+	return os.Getenv(fmt.Sprintf(varNameTempl, prefix, strings.ToUpper(name)))
 }
 
 type config interface {
@@ -87,4 +100,46 @@ func (c *Config) ParseEnv() error {
 
 func (c *Config) GetAddr() string {
 	return fmt.Sprintf(":%s", c.Port)
+}
+
+func (c *Config) IsVaultEnabled() bool {
+	return c.VaultAddress != "" && c.VaultPaths != "" && c.VaultToken != ""
+}
+
+func (c *S3Config) GetVaultSecrets(paths string) error {
+	pathList := strings.Split(paths, ",")
+	for _, p := range pathList {
+		secrets, err := vault.GetSecrets(p)
+		if err != nil {
+			log.Println("config.GetVaultSecrets", err)
+			return err
+		}
+		setConfigVars(c, "S3", secrets)
+	}
+	return nil
+}
+
+func setConfigVars(c config, prefix string, secrets map[string]string) error {
+	t := reflect.ValueOf(c).Elem()
+	for i := 0; i < t.NumField(); i++ {
+		f := t.Field(i)
+		typeField := t.Type().Field(i)
+		checkVault := typeField.Tag.Get("vault")
+		if checkVault != "enabled" {
+			continue
+		}
+		altKey := typeField.Tag.Get("vault_alt_key")
+		key := typeField.Tag.Get("name")
+		if key == "" {
+			key = typeField.Name
+		}
+		for _, k := range []string{key, altKey} {
+			fullKey := fmt.Sprintf(varNameTempl, prefix, strings.ToUpper(k))
+			if v, ok := secrets[fullKey]; ok {
+				f.Set(reflect.ValueOf(v))
+			}
+		}
+
+	}
+	return nil
 }
