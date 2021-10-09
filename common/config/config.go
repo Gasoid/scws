@@ -133,9 +133,9 @@ func setConfigVars(c config, prefix string, secrets map[string]string) error {
 		if key == "" {
 			key = typeField.Name
 		}
-		for _, k := range []string{key, altKey} {
-			fullKey := fmt.Sprintf(varNameTempl, prefix, strings.ToUpper(k))
-			if v, ok := secrets[fullKey]; ok {
+		fullKey := fmt.Sprintf(varNameTempl, prefix, strings.ToUpper(key))
+		for _, k := range []string{fullKey, altKey} {
+			if v, ok := secrets[k]; ok {
 				f.Set(reflect.ValueOf(v))
 			}
 		}

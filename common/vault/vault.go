@@ -44,6 +44,7 @@ func renewToken(client *api.Client) {
 }
 
 func Init(address, token string) error {
+	log.Println("Vault address:", address)
 	client, err := api.NewClient(&api.Config{
 		Address: address,
 	})
@@ -72,6 +73,9 @@ func GetSecrets(path string) (map[string]string, error) {
 	// if secret.Renewable {
 	// 	api.
 	// }
+	if _, ok := secret.Data["data"]; !ok {
+		return nil, errors.New("secret data doesn't exist")
+	}
 	data := secret.Data["data"].(map[string]interface{})
 
 	for k, v := range data {

@@ -26,6 +26,7 @@ func New(c *config.Config) (*S3Storage, error) {
 			log.Println("s3.New", err)
 			return nil, err
 		}
+		log.Println("vault secrets have been loaded successfully")
 	}
 	s := S3Storage{
 		config: &s3Config,

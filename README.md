@@ -5,7 +5,7 @@ The main purpose of the project is to develop static server that can be used wit
 ### Features:
 - Jaeger support
 - Prometeus metrics
-- Vault
+- Vault support
 
 
 ### Storage types:
@@ -21,8 +21,8 @@ The main purpose of the project is to develop static server that can be used wit
 | SCWS_STORAGE | storage type: filesystem, s3 (default: "filesystem") |
 | SCWS_PORT | port (default: "8080") |
 | SCWS_FS_ROOT | root path for filesystem (default: "/www/") |
-| SCWS_VAULT_ADDRESS | vault address |
-| SCWS_VAULT_PATHS | list of paths, e.g. secrets/aws/scws,secrets/aws/scws2 |
+| SCWS_VAULT_ADDRESS | vault address, e.g. http://vault:8200/ |
+| SCWS_VAULT_PATHS | list of paths, e.g. "secrets/aws/scws,secrets/aws/scws2" |
 | SCWS_VAULT_TOKEN | vault token |
 | SCWS_S3_BUCKET | s3 bucket where content is |
 | SCWS_S3_PREFIX | s3 prefix where content is (default: "") |
