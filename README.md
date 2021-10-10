@@ -21,6 +21,7 @@ The main purpose of the project is to develop static server that can be used wit
 | SCWS_STORAGE | storage type: filesystem, s3 (default: "filesystem") |
 | SCWS_PORT | port (default: "8080") |
 | SCWS_FS_ROOT | root path for filesystem (default: "/www/") |
+| SCWS_SETTINGS_PREFIX | prefix for env variables (default: "SCWS_SETTINGS_VAR"), which will be exposed for client, you can get it from /_/settings as json. e.g. SCWS_SETTINGS_VAR_WEBSITE="mycoolwebsite" |
 | SCWS_VAULT_ADDRESS | vault address, e.g. http://vault:8200/ |
 | SCWS_VAULT_PATHS | list of paths, e.g. "secrets/aws/scws,secrets/aws/scws2" |
 | SCWS_VAULT_TOKEN | vault token |
@@ -40,6 +41,7 @@ The main purpose of the project is to develop static server that can be used wit
 ## Useful URLS
 - /_/health
 - /_/metrics
+- /_/settings
 
 
 ## Docker image

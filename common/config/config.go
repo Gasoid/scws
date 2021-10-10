@@ -16,13 +16,14 @@ const (
 
 // Config configures scws
 type Config struct {
-	Port         string `default:"8080"`
-	Domain       string
-	Storage      string `default:"filesystem"`
-	IndexHtml    string `default:"index.html" name:"index_html"`
-	VaultAddress string `name:"vault_address"`
-	VaultToken   string `name:"vault_token"`
-	VaultPaths   string `name:"vault_paths"`
+	Port           string `default:"8080"`
+	Domain         string
+	Storage        string `default:"filesystem"`
+	IndexHtml      string `default:"index.html" name:"index_html"`
+	VaultAddress   string `name:"vault_address"`
+	VaultToken     string `name:"vault_token"`
+	VaultPaths     string `name:"vault_paths"`
+	SettingsPrefix string `default:"SCWS_SETTINGS_VAR_" name:"settings_prefix"`
 }
 
 // FsConfig configures Fs storage
