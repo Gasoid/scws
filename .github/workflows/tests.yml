@@ -9,9 +9,9 @@ on:
     - master
 
 env:
-  SCWS_STORAGE: "filesystem",
-  JAEGER_DISABLED: true,
-  SCWS_SETTINGS_VAR_VAR1: "123",
+  SCWS_STORAGE: "filesystem"
+  JAEGER_DISABLED: true
+  SCWS_SETTINGS_VAR_VAR1: "123"
   # SCWS_FS_ROOT: "/www/"
 
 jobs:
