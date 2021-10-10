@@ -8,6 +8,12 @@ on:
     branches-ignore:
     - master
 
+env:
+  SCWS_STORAGE: "filesystem",
+  JAEGER_DISABLED: true,
+  SCWS_SETTINGS_VAR_VAR1: "123",
+  # SCWS_FS_ROOT: "/www/"
+
 jobs:
 
   testing:
@@ -33,8 +39,3 @@ jobs:
 
     - name: UnitTests
       run: go test -v ./... -coverprofile=coverage.txt -covermode=atomic
-      env:
-        SCWS_STORAGE: "filesystem",
-        JAEGER_DISABLED: true,
-        SCWS_SETTINGS_VAR_VAR1: "123",
-        # SCWS_FS_ROOT: "/www/"
