@@ -31,7 +31,7 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
-    - name: Get dependencies
+    - name: Create www and index.html
       run: mkdir www && echo 1 > www/index.html
 
     - name: Get dependencies
