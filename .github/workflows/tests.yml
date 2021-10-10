@@ -32,10 +32,10 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Get dependencies
-      run: mkdir /www && echo 1 > /www/index.html
+      run: mkdir www && echo 1 > www/index.html
 
     - name: Get dependencies
       run: go mod download
 
     - name: UnitTests
-      run: go test -v ./... -coverprofile=coverage.txt -covermode=atomic
+      run: SCWS_FS_ROOT=`pwd`/www/ go test -v ./... -coverprofile=coverage.txt -covermode=atomic
