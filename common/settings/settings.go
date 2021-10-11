@@ -32,8 +32,8 @@ type Settings struct {
 }
 
 func (s *Settings) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Header().Set("content-type", "application/json")
 	content, _ := json.Marshal(s.vars)
 	fmt.Fprint(w, string(content))
 }
