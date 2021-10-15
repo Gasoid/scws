@@ -60,8 +60,12 @@ RUN cd test-client && npm install && npm run build
 
 
 FROM ghcr.io/gasoid/scws:latest
-WORKDIR /root/
+WORKDIR /www/
 RUN apk --no-cache --update add bash curl less jq openssl
 COPY --from=demo /code/test-client/build/ /www/
-CMD SCWS_INDEX_HTML="index.html" /root/scws
+CMD SCWS_INDEX_HTML="index.html" scws
 ```
+
+
+## License
+This library is published under the terms of the MIT License. Please check the LICENSE file for more details.
