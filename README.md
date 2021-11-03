@@ -68,4 +68,4 @@ CMD SCWS_INDEX_HTML="index.html" scws
 
 
 ## License
-This library is published under the terms of the MIT License. Please check the LICENSE file for more details.
+This program is published under the terms of the MIT License. Please check the LICENSE file for more details.

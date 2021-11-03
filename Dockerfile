@@ -10,6 +10,7 @@ RUN chmod a+x /code/scws
 
 FROM alpine:3.6
 WORKDIR /root/
+COPY mime.types /etc/mime.types
 RUN apk --no-cache --update add bash curl less jq openssl
 COPY --from=builder /code/scws /usr/local/bin/scws
 CMD /usr/local/bin/scws
