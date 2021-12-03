@@ -10,4 +10,4 @@ FROM scws:check
 WORKDIR /root/
 RUN apk --no-cache --update add bash curl less jq openssl
 COPY --from=demo /code/test-client/build/ /www/
-CMD SCWS_INDEX_HTML="index.html" /root/scws
+CMD SCWS_INDEX_HTML="index.html" scws

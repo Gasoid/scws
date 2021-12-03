@@ -6,10 +6,6 @@ import (
 	"scws/common/config"
 	"scws/storage/fs"
 	"scws/storage/s3"
-	"strings"
-
-	"github.com/opentracing/opentracing-go"
-	"github.com/opentracing/opentracing-go/ext"
 )
 
 const (
@@ -46,24 +42,5 @@ func New(c *config.Config) (*Storage, error) {
 }
 
 func (s *Storage) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	tracer := opentracing.GlobalTracer()
-	var span opentracing.Span
-	if tracer != nil {
-		spanCtx, err := tracer.Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(r.Header))
-		if err != nil {
-			span = tracer.StartSpan("storage.ServeHTTP")
-		} else {
-			span = tracer.StartSpan("storage.ServeHTTP", ext.RPCServerOption(spanCtx))
-		}
-		defer span.Finish()
-		span.SetTag("http.status_code", http.StatusOK)
-		span.SetTag("http.url", r.URL.Path)
-		span.SetTag("storage", s.storage.GetName())
-	}
-	if strings.HasSuffix(r.URL.Path, "/") || r.URL.Path == "/" {
-		s.storage.ServeFile(w, r, s.config.IndexHtml)
-	} else {
-		s.storage.ServeHTTP(w, r)
-	}
-	log.Println(r.URL.Path, r.RemoteAddr, w.Header().Get("status"))
+	s.storage.ServeHTTP(w, r)
 }
