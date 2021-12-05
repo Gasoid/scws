@@ -6,6 +6,8 @@ import (
 	"scws/config"
 	"scws/storage/fs"
 	"scws/storage/s3"
+
+	"github.com/pkg/errors"
 )
 
 const (
@@ -16,7 +18,6 @@ const (
 type IStorage interface {
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 	GetName() string
-	ServeFile(w http.ResponseWriter, r *http.Request, filePath string)
 }
 
 type Storage struct {
@@ -29,13 +30,13 @@ func New(c *config.Config) (*Storage, error) {
 	s := Storage{config: c}
 	switch c.Storage {
 	case FSStorage:
-		s.storage, err = fs.New(c)
+		s.storage, err = fs.New(c.IndexHtml)
 	case S3:
-		s.storage, err = s3.New(c)
+		s.storage, err = s3.New(c.IsVaultEnabled(), c.VaultPaths)
 	}
 	if s.storage == nil {
 		log.Println("couldn't connect to storage")
-		return nil, err
+		return nil, errors.Wrap(err, "storage.New failed")
 	}
 	return &s, nil
 }

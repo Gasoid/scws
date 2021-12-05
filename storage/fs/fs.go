@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"path"
 	"scws/config"
 )
 
@@ -12,7 +11,7 @@ const (
 	healthPath = "/_/health"
 )
 
-func New(c *config.Config) (*FSStorage, error) {
+func New(index string) (*FSStorage, error) {
 	fsConfig := config.FsConfig{}
 	err := fsConfig.ParseEnv()
 	if err != nil {
@@ -21,7 +20,7 @@ func New(c *config.Config) (*FSStorage, error) {
 	}
 	s := FSStorage{
 		config: &fsConfig,
-		index:  c.IndexHtml,
+		index:  index,
 	}
 	return &s, nil
 }
@@ -29,7 +28,6 @@ func New(c *config.Config) (*FSStorage, error) {
 type FSStorage struct {
 	config *config.FsConfig
 	index  string
-	//scwsConfig *config.Config
 }
 
 type indexDir struct {
@@ -60,11 +58,6 @@ func (s *FSStorage) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		index: s.index,
 	}
 	http.FileServer(dir).ServeHTTP(w, r)
-}
-
-func (s *FSStorage) ServeFile(w http.ResponseWriter, r *http.Request, filePath string) {
-	filePath = path.Join(s.config.Root, filePath)
-	http.ServeFile(w, r, filePath)
 }
 
 func (s *FSStorage) GetName() string {

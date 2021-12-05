@@ -2,6 +2,7 @@ package settings
 
 import (
 	"log"
+	"os"
 	"scws/config"
 	"testing"
 
@@ -14,7 +15,7 @@ func TestNew(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, c.SettingsPrefix)
 	log.Println(c.SettingsPrefix)
-	settings := New(c)
+	settings := New(c.SettingsPrefix, os.Environ)
 	v := settings.vars["VAR1"]
 	assert.NotEmpty(t, v)
 }

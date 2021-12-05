@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"scws/config"
 	"scws/settings"
 	"scws/storage"
@@ -30,10 +31,10 @@ func Run() {
 		return
 	}
 	defer closer.Close()
-	setts := settings.New(c)
+	setts := settings.New(c.SettingsPrefix, os.Environ)
 	scwsMux := newScwsMux(s.Handler(), setts.Handler())
-	srv := newServer(c, scwsHandler(scwsMux))
-	catchSignal(srv, c)
+	srv := newServer(c.GetAddr(), scwsHandler(scwsMux))
+	catchSignal(srv, setts)
 	log.Printf("Starting server on %s", c.GetAddr())
 	log.Fatal(srv.ListenAndServe())
 }
@@ -46,13 +47,13 @@ func newScwsMux(storageHandler http.Handler, settingsHandler http.Handler) *http
 	return scwsMux
 }
 
-func newServer(c *config.Config, handler http.Handler) *http.Server {
+func newServer(addr string, handler http.Handler) *http.Server {
 	srv := &http.Server{
 		ReadTimeout:  120 * time.Second,
 		WriteTimeout: 120 * time.Second,
 		IdleTimeout:  120 * time.Second,
 		Handler:      handler,
-		Addr:         c.GetAddr(),
+		Addr:         addr,
 	}
 	return srv
 }

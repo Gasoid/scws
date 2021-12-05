@@ -17,11 +17,11 @@ const (
 	healthPath = "/_/health"
 )
 
-func New(c *config.Config) (*S3Storage, error) {
+func New(isVaultEnabled bool, vaultPaths string) (*S3Storage, error) {
 	s3Config := config.S3Config{}
 	s3Config.ParseEnv()
-	if c.IsVaultEnabled() {
-		err := s3Config.GetVaultSecrets(c.VaultPaths)
+	if isVaultEnabled {
+		err := s3Config.GetVaultSecrets(vaultPaths)
 		if err != nil {
 			log.Println("s3.New", err)
 			return nil, err
@@ -52,9 +52,8 @@ func New(c *config.Config) (*S3Storage, error) {
 
 type S3Storage struct {
 	config *config.S3Config
-	//scwsConfig *config.Config
-	store cloudstorage.Store
-	index string
+	store  cloudstorage.Store
+	index  string
 }
 
 type object struct {
@@ -98,10 +97,6 @@ func (s *S3Storage) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	o := s.newObject()
 
 	http.FileServer(o).ServeHTTP(w, r)
-}
-
-func (s *S3Storage) ServeFile(w http.ResponseWriter, r *http.Request, filePath string) {
-	s.ServeHTTP(w, r)
 }
 
 func (s *S3Storage) newObject() *object {

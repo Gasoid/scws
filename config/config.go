@@ -53,7 +53,7 @@ func New() *Config {
 	return &c
 }
 
-func getEnvVar(name string, prefix string) string {
+func getEnvVar(name, prefix string) string {
 	if prefix != "" {
 		prefix = prefix + "_"
 	}
