@@ -3,7 +3,7 @@ package storage
 import (
 	"log"
 	"net/http"
-	"scws/common/config"
+	"scws/config"
 	"scws/storage/fs"
 	"scws/storage/s3"
 )

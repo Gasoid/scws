@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 	"net/http"
-	"scws/common/config"
-	"scws/common/settings"
-	"scws/common/tracing"
+	"scws/config"
+	"scws/settings"
 	"scws/storage"
+	"scws/tracing"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -30,8 +30,8 @@ func Run() {
 		return
 	}
 	defer closer.Close()
-	scwsSettings := settings.New(c)
-	scwsMux := newScwsMux(s.Handler(), scwsSettings.Handler())
+	setts := settings.New(c)
+	scwsMux := newScwsMux(s.Handler(), setts.Handler())
 	srv := newServer(c, scwsHandler(scwsMux))
 	catchSignal(srv, c)
 	log.Printf("Starting server on %s", c.GetAddr())

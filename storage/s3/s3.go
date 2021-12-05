@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"path"
-	"scws/common/config"
+	"scws/config"
 
 	"github.com/araddon/gou"
 	"github.com/lytics/cloudstorage"

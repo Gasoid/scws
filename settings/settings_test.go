@@ -2,7 +2,7 @@ package settings
 
 import (
 	"log"
-	"scws/common/config"
+	"scws/config"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
