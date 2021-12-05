@@ -3,6 +3,7 @@ package settings
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -17,7 +18,7 @@ func New(prefix string, getFuncKeys func() []string) *Settings {
 		prefix:  prefix,
 		getKeys: getFuncKeys,
 	}
-	setts.loadVars(prefix)
+	setts.loadVars()
 	return &setts
 }
 
@@ -40,14 +41,15 @@ func (setts *Settings) Handler() *Settings {
 
 func (setts *Settings) Reload() {
 	setts.vars = map[string]string{}
-	setts.loadVars(setts.prefix)
+	setts.loadVars()
 }
 
-func (setts *Settings) loadVars(prefix string) {
+func (setts *Settings) loadVars() {
 	for _, envVar := range setts.getKeys() {
+		log.Println(envVar)
 		kv := strings.Split(envVar, varSep)
-		if strings.HasPrefix(kv[0], prefix) && len(kv) == 2 {
-			key := strings.Replace(kv[0], prefix, "", 1)
+		if strings.HasPrefix(kv[0], setts.prefix) && len(kv) == 2 {
+			key := strings.Replace(kv[0], setts.prefix, "", 1)
 			setts.vars[key] = kv[1]
 		}
 	}

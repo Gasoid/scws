@@ -10,7 +10,6 @@ import (
 	"scws/tracing"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -23,12 +22,12 @@ func Run() {
 	c := config.New()
 	s, err := storage.New(c)
 	if err != nil {
-		log.Println(errors.Wrap(err, "Run"))
+		log.Println("Run", err.Error())
 		return
 	}
 	closer, err := tracing.JaegerInit()
 	if err != nil {
-		log.Println(errors.Wrap(err, "Run"))
+		log.Println("Run", err.Error())
 		return
 	}
 	defer closer.Close()

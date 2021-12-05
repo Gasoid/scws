@@ -26,6 +26,9 @@ func catchSignal(srv scwsServer, setts scwsSettings) {
 			s := <-signalChanel
 			switch s {
 			case syscall.SIGHUP:
+				// Reload doesn't load new env variables or new values,
+				// because child process has a copy of env vars from parent process
+				// reload will work for config Maps
 				log.Println("Got signal to reload settings.")
 				setts.Reload()
 			case syscall.SIGINT:
