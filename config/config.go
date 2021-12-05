@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 	"reflect"
-	"scws/common/vault"
+	"scws/vault"
 	"strings"
 )
 

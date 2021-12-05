@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"scws/common/config"
+	"scws/config"
 	"strings"
 )
 
@@ -14,26 +14,30 @@ const (
 )
 
 func New(c *config.Config) *Settings {
-	s := Settings{
+	setts := Settings{
 		vars: map[string]string{},
 	}
 	for _, envVar := range os.Environ() {
 		kv := strings.Split(envVar, varSep)
 		if strings.HasPrefix(kv[0], c.SettingsPrefix) && len(kv) == 2 {
 			key := strings.Replace(kv[0], c.SettingsPrefix, "", 1)
-			s.vars[key] = kv[1]
+			setts.vars[key] = kv[1]
 		}
 	}
-	return &s
+	return &setts
 }
 
 type Settings struct {
 	vars map[string]string
 }
 
-func (s *Settings) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (setts *Settings) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	content, _ := json.Marshal(s.vars)
+	content, _ := json.Marshal(setts.vars)
 	fmt.Fprint(w, string(content))
+}
+
+func (setts *Settings) Handler() *Settings {
+	return setts
 }

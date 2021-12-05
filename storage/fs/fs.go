@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"path"
-	"scws/common/config"
+	"scws/config"
 )
 
 const (
