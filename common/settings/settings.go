@@ -37,3 +37,7 @@ func (s *Settings) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	content, _ := json.Marshal(s.vars)
 	fmt.Fprint(w, string(content))
 }
+
+func (s *Settings) Handler() *Settings {
+	return s
+}

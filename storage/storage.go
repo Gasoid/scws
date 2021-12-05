@@ -9,9 +9,8 @@ import (
 )
 
 const (
-	FSStorage  = "filesystem"
-	S3         = "s3"
-	serverName = "static-backend"
+	FSStorage = "filesystem"
+	S3        = "s3"
 )
 
 type IStorage interface {
@@ -39,6 +38,10 @@ func New(c *config.Config) (*Storage, error) {
 		return nil, err
 	}
 	return &s, nil
+}
+
+func (s *Storage) Handler() *Storage {
+	return s
 }
 
 func (s *Storage) ServeHTTP(w http.ResponseWriter, r *http.Request) {

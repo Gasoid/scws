@@ -12,6 +12,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+const (
+	metricsPath  = "/_/metrics"
+	settingsPath = "/_/settings"
+)
+
 func Run() {
 	c := config.New()
 	s, err := storage.New(c)
@@ -25,19 +30,23 @@ func Run() {
 		return
 	}
 	defer closer.Close()
-	srv := newServer(c, s)
+	scwsSettings := settings.New(c)
+	scwsMux := newScwsMux(s.Handler(), scwsSettings.Handler())
+	srv := newServer(c, scwsHandler(scwsMux))
+	catchSignal(srv, c)
 	log.Printf("Starting server on %s", c.GetAddr())
 	log.Fatal(srv.ListenAndServe())
 }
 
-func newServer(c *config.Config, s *storage.Storage) *http.Server {
+func newScwsMux(storageHandler http.Handler, settingsHandler http.Handler) *http.ServeMux {
 	scwsMux := http.DefaultServeMux
-	scwsMux.Handle("/_/metrics", promhttp.Handler())
-	scwsMux.Handle("/_/settings", settings.New(c))
-	scwsMux.Handle("/", s)
-	var handler http.Handler = scwsMux
-	handler = scwsHandler(handler, c)
+	scwsMux.Handle(metricsPath, promhttp.Handler())
+	scwsMux.Handle(settingsPath, settingsHandler)
+	scwsMux.Handle("/", storageHandler)
+	return scwsMux
+}
 
+func newServer(c *config.Config, handler http.Handler) *http.Server {
 	srv := &http.Server{
 		ReadTimeout:  120 * time.Second,
 		WriteTimeout: 120 * time.Second,
@@ -48,7 +57,7 @@ func newServer(c *config.Config, s *storage.Storage) *http.Server {
 	return srv
 }
 
-func scwsHandler(h http.Handler, c *config.Config) http.Handler {
+func scwsHandler(h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		writer := &responseWriter{
 			ResponseWriter: w,
@@ -57,7 +66,7 @@ func scwsHandler(h http.Handler, c *config.Config) http.Handler {
 		h.ServeHTTP(writer, r)
 		logRequest(writer, r)
 		traceRequest(writer, r)
-		if r.URL.Path == "/" || r.URL.Path == "/_/settings" || r.URL.Path == "/_/metrics" {
+		if r.URL.Path == "/" || r.URL.Path == settingsPath || r.URL.Path == metricsPath {
 			writer.Flush()
 			return
 		}
