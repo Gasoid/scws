@@ -16,7 +16,6 @@ const (
 type IStorage interface {
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 	GetName() string
-	ServeFile(w http.ResponseWriter, r *http.Request, filePath string)
 }
 
 type Storage struct {

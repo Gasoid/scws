@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -26,16 +26,16 @@ func catchSignal(srv scwsServer, setts scwsSettings) {
 			s := <-signalChanel
 			switch s {
 			case syscall.SIGHUP:
-				fmt.Println("Signal hang up triggered.")
+				log.Println("Got signal to reload settings.")
 				setts.Reload()
 			case syscall.SIGINT:
-				fmt.Println("Signal interrupt triggered.")
+				log.Println("Signal interrupt triggered.")
 				srv.Shutdown(context.TODO())
 			case syscall.SIGTERM:
-				fmt.Println("Signal terminte triggered.")
+				log.Println("Signal terminte triggered.")
 				srv.Shutdown(context.TODO())
 			case syscall.SIGQUIT:
-				fmt.Println("Signal quit triggered.")
+				log.Println("Signal quit triggered.")
 				srv.Shutdown(context.TODO())
 			}
 		}
