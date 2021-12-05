@@ -16,7 +16,7 @@ func TestNew(t *testing.T) {
 	if c.Storage != s3 {
 		t.Skip("no aws creds, skipping tests")
 	}
-	storage, err := New(c)
+	storage, err := New(c.IsVaultEnabled(), c.VaultPaths)
 	assert.NoError(t, err)
 	assert.NotNil(t, storage)
 }
@@ -26,7 +26,7 @@ func TestNewObject(t *testing.T) {
 	if c.Storage != s3 {
 		t.Skip("no aws creds, skipping tests")
 	}
-	storage, err := New(c)
+	storage, err := New(c.IsVaultEnabled(), c.VaultPaths)
 	assert.NoError(t, err)
 	o := storage.newObject()
 	name := "README.md"
