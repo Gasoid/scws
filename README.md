@@ -1,6 +1,7 @@
 # Static Content Web Server
 The main purpose of the project is to develop static server that can be used with modern javascript frameworks (React, vue.js and so on)
 
+You don't need to use nginx in order to serve your react project.
 
 ### Features:
 - Jaeger support
