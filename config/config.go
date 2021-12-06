@@ -110,7 +110,7 @@ func (c *Config) IsVaultEnabled() bool {
 func (c *S3Config) GetVaultSecrets(paths string) error {
 	pathList := strings.Split(paths, ",")
 	for _, p := range pathList {
-		secrets, err := vault.GetSecrets(p)
+		secrets, err := vault.Secrets(p)
 		if err != nil {
 			log.Println("config.GetVaultSecrets", err)
 			return err

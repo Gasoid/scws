@@ -22,12 +22,11 @@ type IStorage interface {
 
 type Storage struct {
 	storage IStorage
-	config  *config.Config
 }
 
 func New(c *config.Config) (*Storage, error) {
 	var err error
-	s := Storage{config: c}
+	s := Storage{}
 	switch c.Storage {
 	case FSStorage:
 		s.storage, err = fs.New(c.IndexHtml)

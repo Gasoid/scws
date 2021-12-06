@@ -39,7 +39,7 @@ func Run() {
 	log.Fatal(srv.ListenAndServe())
 }
 
-func newScwsMux(storageHandler http.Handler, settingsHandler http.Handler) *http.ServeMux {
+func newScwsMux(storageHandler, settingsHandler http.Handler) *http.ServeMux {
 	scwsMux := http.DefaultServeMux
 	scwsMux.Handle(metricsPath, promhttp.Handler())
 	scwsMux.Handle(settingsPath, settingsHandler)

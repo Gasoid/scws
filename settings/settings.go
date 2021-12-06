@@ -3,7 +3,6 @@ package settings
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -46,7 +45,6 @@ func (setts *Settings) Reload() {
 
 func (setts *Settings) loadVars() {
 	for _, envVar := range setts.getKeys() {
-		log.Println(envVar)
 		kv := strings.Split(envVar, varSep)
 		if strings.HasPrefix(kv[0], setts.prefix) && len(kv) == 2 {
 			key := strings.Replace(kv[0], setts.prefix, "", 1)
