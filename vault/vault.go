@@ -9,11 +9,18 @@ import (
 )
 
 var (
-	vaultClient *api.Client
+	vaultClient vaultService
 )
 
+type vaultService interface {
+	Logical() *api.Logical
+	SetToken(v string)
+	Auth() *api.Auth
+	Sys() *api.Sys
+}
+
 // renewToken is intended to renew token
-func renewToken(client *api.Client) {
+func renewToken(client vaultService) {
 	token := client.Auth().Token()
 	secret, err := token.LookupSelf()
 	if err != nil {
@@ -54,13 +61,18 @@ func Init(address, token string) error {
 		return err
 	}
 	vaultClient.SetToken(token)
+	_, err = vaultClient.Sys().Health()
+	if err != nil {
+		log.Println("Can't connect to vault: ", err.Error())
+		return err
+	}
 
 	go renewToken(vaultClient)
 
 	return nil
 }
 
-func GetSecrets(path string) (map[string]string, error) {
+func Secrets(path string) (map[string]string, error) {
 	secretMap := map[string]string{}
 	secret, err := vaultClient.Logical().Read(path)
 	if err != nil {
