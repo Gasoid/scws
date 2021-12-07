@@ -14,8 +14,9 @@ import (
 )
 
 const (
-	metricsPath  = "/_/metrics"
-	settingsPath = "/_/settings"
+	metricsPath           = "/_/metrics"
+	settingsPath          = "/_/settings"
+	ifModifiedSinceHeader = "If-Modified-Since"
 )
 
 func Run() {
@@ -63,6 +64,9 @@ func scwsHandler(h http.Handler) http.Handler {
 		writer := &responseWriter{
 			ResponseWriter: w,
 			status:         defaultStatus,
+		}
+		if r.Header.Get(ifModifiedSinceHeader) != "" && r.Method == http.MethodGet {
+			r.Header.Del(ifModifiedSinceHeader)
 		}
 		h.ServeHTTP(writer, r)
 		logRequest(writer, r)
