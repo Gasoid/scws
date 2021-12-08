@@ -12,7 +12,7 @@ func TestCheckFile(t *testing.T) {
 }
 
 func TestHealthProbe(t *testing.T) {
-	storage, err := New("index.html")
+	storage, err := New("index2.html")
 	assert.NoError(t, err)
 	err = storage.HealthProbe()
 	assert.Error(t, err)
