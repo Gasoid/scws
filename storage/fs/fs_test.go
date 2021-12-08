@@ -21,6 +21,7 @@ func TestHealthProbe(t *testing.T) {
 func TestIndexPath(t *testing.T) {
 	storage, err := New("index.html")
 	assert.NoError(t, err)
+	storage.config.Root = "/www"
 	assert.Equal(t, storage.indexPath(), "/www/index.html")
 	storage.index = "dir1/index.html"
 	assert.Equal(t, storage.indexPath(), "/www/dir1/index.html")
