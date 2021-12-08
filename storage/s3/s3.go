@@ -2,7 +2,6 @@ package s3
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"path"
@@ -11,10 +10,6 @@ import (
 	"github.com/araddon/gou"
 	"github.com/lytics/cloudstorage"
 	"github.com/lytics/cloudstorage/awss3"
-)
-
-const (
-	healthPath = "/_/health"
 )
 
 func New(isVaultEnabled bool, vaultPaths string) (*S3Storage, error) {
@@ -90,12 +85,7 @@ func (o *object) Open(name string) (http.File, error) {
 }
 
 func (s *S3Storage) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == healthPath {
-		healthHandler(w, r)
-		return
-	}
 	o := s.newObject()
-
 	http.FileServer(o).ServeHTTP(w, r)
 }
 
@@ -111,7 +101,8 @@ func (s *S3Storage) GetName() string {
 	return "s3"
 }
 
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "OK")
+// HealthProbe is exported
+// TODO: add real check
+func (s *S3Storage) HealthProbe() error {
+	return nil
 }

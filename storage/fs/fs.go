@@ -1,14 +1,12 @@
 package fs
 
 import (
-	"fmt"
+	"errors"
 	"log"
 	"net/http"
+	"os"
+	"path"
 	"scws/config"
-)
-
-const (
-	healthPath = "/_/health"
 )
 
 func New(index string) (*FSStorage, error) {
@@ -49,10 +47,6 @@ func (d indexDir) Open(name string) (http.File, error) {
 }
 
 func (s *FSStorage) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == healthPath {
-		healthHandler(w, r)
-		return
-	}
 	dir := indexDir{
 		dir:   s.config.Root,
 		index: s.index,
@@ -64,7 +58,18 @@ func (s *FSStorage) GetName() string {
 	return "filesystem"
 }
 
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "OK")
+func (s *FSStorage) indexPath() string {
+	return path.Join(s.config.Root, s.index)
+}
+
+func checkFile(path string) error {
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		return err
+	} else {
+		return nil
+	}
+}
+
+func (s *FSStorage) HealthProbe() error {
+	return checkFile(s.indexPath())
 }
