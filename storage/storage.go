@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"scws/config"
@@ -15,9 +16,15 @@ const (
 	S3        = "s3"
 )
 
+type StorageHandler interface {
+	Handler() http.Handler
+	HealthProbe() http.Handler
+}
+
 type IStorage interface {
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 	GetName() string
+	HealthProbe() error
 }
 
 type Storage struct {
@@ -40,10 +47,21 @@ func New(c *config.Config) (*Storage, error) {
 	return &s, nil
 }
 
-func (s *Storage) Handler() *Storage {
+func (s *Storage) Handler() http.Handler {
 	return s
 }
 
 func (s *Storage) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.storage.ServeHTTP(w, r)
+}
+
+func (s *Storage) HealthProbe() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := s.HealthProbe(); err != nil {
+			fmt.Fprint(w, "healthy")
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+	})
 }

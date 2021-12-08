@@ -14,6 +14,14 @@ func (d *dummyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "dummy handler works")
 }
 
+func (d *dummyHandler) Handler() http.Handler {
+	return d
+}
+
+func (d *dummyHandler) HealthProbe() http.Handler {
+	return d
+}
+
 func TestNewScwsMux(t *testing.T) {
 	h := dummyHandler("")
 	testMux := newScwsMux(&h, &h)

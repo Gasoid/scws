@@ -15,6 +15,7 @@ import (
 
 const (
 	metricsPath           = "/_/metrics"
+	healthPath            = "/_/health"
 	settingsPath          = "/_/settings"
 	ifModifiedSinceHeader = "If-Modified-Since"
 )
@@ -33,18 +34,19 @@ func Run() {
 	}
 	defer closer.Close()
 	setts := settings.New(c.SettingsPrefix, os.Environ)
-	scwsMux := newScwsMux(s.Handler(), setts.Handler())
+	scwsMux := newScwsMux(s, setts.Handler())
 	srv := newServer(c.GetAddr(), scwsHandler(scwsMux))
 	catchSignal(srv, setts)
 	log.Printf("Starting server on %s", c.GetAddr())
 	log.Fatal(srv.ListenAndServe())
 }
 
-func newScwsMux(storageHandler, settingsHandler http.Handler) *http.ServeMux {
+func newScwsMux(s storage.StorageHandler, settsHandler http.Handler) *http.ServeMux {
 	scwsMux := http.DefaultServeMux
 	scwsMux.Handle(metricsPath, promhttp.Handler())
-	scwsMux.Handle(settingsPath, settingsHandler)
-	scwsMux.Handle("/", storageHandler)
+	scwsMux.Handle(healthPath, s.HealthProbe())
+	scwsMux.Handle(settingsPath, settsHandler)
+	scwsMux.Handle("/", s.Handler())
 	return scwsMux
 }
 
