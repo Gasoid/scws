@@ -23,6 +23,7 @@ You don't need to use nginx in order to serve your react project.
 | SCWS_PORT | "8080" | port |
 | SCWS_FS_ROOT | "/www/" | root path for filesystem |
 | SCWS_SETTINGS_PREFIX | "SCWS_SETTINGS_VAR" | prefix for env variables, which will be exposed for client, you can get it from /_/settings as json. e.g. SCWS_SETTINGS_VAR_WEBSITE="mycoolwebsite" |
+| SCWS_SETTINGS_PATH | "/_/settings" | path for settings |
 | SCWS_VAULT_ADDRESS | "" | vault address, e.g. http://vault:8200/ |
 | SCWS_VAULT_PATHS | "" | list of paths, e.g. "secrets/aws/scws,secrets/aws/scws2" |
 | SCWS_VAULT_TOKEN | "" | vault token |
