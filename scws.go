@@ -16,7 +16,7 @@ import (
 const (
 	metricsPath           = "/_/metrics"
 	healthPath            = "/_/health"
-	settingsPath          = "/_/settings"
+	rootPath              = "/"
 	ifModifiedSinceHeader = "If-Modified-Since"
 )
 
@@ -34,20 +34,17 @@ func Run() {
 	}
 	defer closer.Close()
 	setts := settings.New(c.SettingsPrefix, os.Environ)
-	scwsMux := newScwsMux(s, setts.Handler())
-	srv := newServer(c.GetAddr(), scwsHandler(scwsMux))
+	scwsHandler := newScwsHandler(
+		map[string]http.Handler{
+			c.SettingsPath: setts.Handler(),
+			metricsPath:    promhttp.Handler(),
+			healthPath:     s.HealthProbe(),
+			rootPath:       s.Handler(),
+		}, rootPath)
+	srv := newServer(c.GetAddr(), scwsHandler)
 	catchSignal(srv, setts)
 	log.Printf("Starting server on %s", c.GetAddr())
 	log.Fatal(srv.ListenAndServe())
-}
-
-func newScwsMux(s storage.StorageHandler, settsHandler http.Handler) *http.ServeMux {
-	scwsMux := http.DefaultServeMux
-	scwsMux.Handle(metricsPath, promhttp.Handler())
-	scwsMux.Handle(healthPath, s.HealthProbe())
-	scwsMux.Handle(settingsPath, settsHandler)
-	scwsMux.Handle("/", s.Handler())
-	return scwsMux
 }
 
 func newServer(addr string, handler http.Handler) *http.Server {
@@ -59,31 +56,4 @@ func newServer(addr string, handler http.Handler) *http.Server {
 		Addr:         addr,
 	}
 	return srv
-}
-
-func scwsHandler(h http.Handler) http.Handler {
-	fn := func(w http.ResponseWriter, r *http.Request) {
-		writer := &responseWriter{
-			ResponseWriter: w,
-			status:         defaultStatus,
-		}
-		if r.Header.Get(ifModifiedSinceHeader) != "" && r.Method == http.MethodGet {
-			r.Header.Del(ifModifiedSinceHeader)
-		}
-		h.ServeHTTP(writer, r)
-		logRequest(writer, r)
-		traceRequest(writer, r)
-		if r.URL.Path == "/" || r.URL.Path == settingsPath || r.URL.Path == metricsPath {
-			writer.Flush()
-			return
-		}
-		if writer.Status() == http.StatusNotFound {
-			writer.reset(w)
-			writer.status = http.StatusOK
-			r.URL.Path = "/"
-			h.ServeHTTP(writer, r)
-		}
-		writer.Flush()
-	}
-	return http.HandlerFunc(fn)
 }

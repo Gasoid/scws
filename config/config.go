@@ -24,6 +24,7 @@ type Config struct {
 	VaultToken     string `name:"vault_token"`
 	VaultPaths     string `name:"vault_paths"`
 	SettingsPrefix string `default:"SCWS_SETTINGS_VAR_" name:"settings_prefix"`
+	SettingsPath   string `default:"/_/settings" name:"settings_path"`
 }
 
 // FsConfig configures Fs storage

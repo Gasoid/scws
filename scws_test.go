@@ -22,18 +22,6 @@ func (d *dummyHandler) HealthProbe() http.Handler {
 	return d
 }
 
-func TestNewScwsMux(t *testing.T) {
-	h := dummyHandler("")
-	testMux := newScwsMux(&h, &h)
-	assert.NotNil(t, testMux)
-}
-
-func TestScwsHandler(t *testing.T) {
-	h := dummyHandler("")
-	testHandler := scwsHandler(&h)
-	assert.NotNil(t, testHandler)
-}
-
 func TestNewServer(t *testing.T) {
 	h := dummyHandler("")
 	server := newServer("0.0.0.0:8080", &h)
