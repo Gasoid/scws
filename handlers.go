@@ -5,17 +5,19 @@ import (
 )
 
 func newScwsHandler(routes map[string]http.Handler, root string) http.Handler {
-	scwsHandler := &ScwsHandler{routes, root}
+	scwsHandler := &ScwsHandler{routes: routes, rootPath: root}
 	scwsMux := http.DefaultServeMux
 	for k, v := range routes {
 		scwsMux.Handle(k, v)
 	}
+	scwsHandler.metrics = metrics()
 	return scwsHandler.Handler(scwsMux)
 }
 
 type ScwsHandler struct {
 	routes   map[string]http.Handler
 	rootPath string
+	metrics  func(w ResponseWriter, r *http.Request)
 }
 
 func (scwsHandler *ScwsHandler) Handler(h http.Handler) http.Handler {
@@ -30,6 +32,7 @@ func (scwsHandler *ScwsHandler) Handler(h http.Handler) http.Handler {
 		h.ServeHTTP(writer, r)
 		logRequest(writer, r)
 		traceRequest(writer, r)
+		scwsHandler.metrics(writer, r)
 		if _, ok := scwsHandler.routes[r.URL.Path]; ok {
 			writer.Flush()
 			return

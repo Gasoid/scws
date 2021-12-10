@@ -15,7 +15,7 @@ func TestNewScwsHandler(t *testing.T) {
 
 func TestScwsHandler(t *testing.T) {
 	h := dummyHandler("")
-	testMux := ScwsHandler{map[string]http.Handler{"/": &h}, "/"}
+	testMux := ScwsHandler{routes: map[string]http.Handler{"/": &h}, rootPath: "/"}
 	testHandler := testMux.Handler(&h)
 	assert.NotNil(t, testHandler)
 }
