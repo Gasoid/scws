@@ -20,7 +20,7 @@ func metrics() func(w ResponseWriter, r *http.Request) {
 		prometheus.HistogramOpts{
 			Name:    "scws_response_size_bytes",
 			Help:    "A histogram of response sizes for requests.",
-			Buckets: []float64{200, 500, 900, 1500, 5000, 10000},
+			Buckets: []float64{500, 1500, 5000, 10000, 100000, 200000},
 		},
 	)
 	counter := prometheus.NewCounter(prometheus.CounterOpts{
