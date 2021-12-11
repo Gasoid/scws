@@ -10,3 +10,4 @@ FROM scws:check
 WORKDIR /root/
 RUN apk --no-cache --update add bash curl less jq openssl
 COPY --from=demo /code/test-client/build/ /www/
+CMD SCWS_SETTINGS_VAR_WEBSITE="example.com" SCWS_SETTINGS_VAR_GOOGLE_MAP_IS_ENABLED="false" scws
