@@ -107,7 +107,7 @@ FROM ghcr.io/gasoid/scws:latest
 WORKDIR /www/
 RUN apk --no-cache --update add bash curl less jq openssl
 COPY --from=demo /code/test-client/build/ /www/
-CMD SCWS_INDEX_HTML="index.html" scws
+CMD SCWS_SETTINGS_VAR_WEBSITE="example.com" SCWS_SETTINGS_VAR_GOOGLE_MAP_IS_ENABLED="false" scws
 ```
 
 ## K8s/helm example for settings
@@ -132,7 +132,7 @@ deployment.yml:
           {{- end}}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-          {{- range $key, $val := .Values.variables }}
+          {{- range $key, $val := .Values.react_variables }}
           - name:  SCWS_SETTINGS_VAR_{{ $key }}
             value: {{ $val | quote }}
           {{- end }}
