@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -24,12 +25,12 @@ func Run() {
 	c := config.New()
 	s, err := storage.New(c)
 	if err != nil {
-		log.Println("Run", err.Error())
+		fmt.Println("Please check configuration:", err.Error())
 		return
 	}
 	closer, err := tracing.JaegerInit()
 	if err != nil {
-		log.Println("Run", err.Error())
+		fmt.Println("Run", err.Error())
 		return
 	}
 	defer closer.Close()
@@ -40,7 +41,7 @@ func Run() {
 			metricsPath:    promhttp.Handler(),
 			healthPath:     s.HealthProbe(),
 			rootPath:       s.Handler(),
-		}, rootPath)
+		})
 	srv := newServer(c.GetAddr(), scwsHandler)
 	catchSignal(srv, setts)
 	log.Printf("Starting server on %s", c.GetAddr())

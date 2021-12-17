@@ -11,8 +11,7 @@ import (
 
 func TestNew(t *testing.T) {
 	c := config.New()
-	err := c.ParseEnv()
-	assert.NoError(t, err)
+	c.ParseEnv()
 	assert.NotEmpty(t, c.SettingsPrefix)
 	log.Println(c.SettingsPrefix)
 	settings := New(c.SettingsPrefix, os.Environ)

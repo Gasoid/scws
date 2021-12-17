@@ -2,6 +2,7 @@ package vault
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -57,14 +58,12 @@ func Init(address, token string) error {
 	})
 	vaultClient = client
 	if err != nil {
-		log.Println("Can't connect to vault: ", err.Error())
-		return err
+		return fmt.Errorf("vault.api.NewClient failed: %v", err)
 	}
 	vaultClient.SetToken(token)
 	_, err = vaultClient.Sys().Health()
 	if err != nil {
-		log.Println("Can't connect to vault: ", err.Error())
-		return err
+		return fmt.Errorf("can't connect to vault: %v", err)
 	}
 
 	go renewToken(vaultClient)
@@ -76,8 +75,7 @@ func Secrets(path string) (map[string]string, error) {
 	secretMap := map[string]string{}
 	secret, err := vaultClient.Logical().Read(path)
 	if err != nil {
-		log.Println("Can't pull secrets: ", err.Error())
-		return nil, err
+		return nil, fmt.Errorf("vault.Logical().Read() can't read secrets: %v", err)
 	}
 	if secret == nil {
 		return nil, errors.New("secret data doesn't exist")

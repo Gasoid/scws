@@ -2,20 +2,18 @@ package fs
 
 import (
 	"errors"
-	"log"
+	"fmt"
+	"io/fs"
 	"net/http"
 	"os"
 	"path"
 	"scws/config"
+	"strings"
 )
 
 func New(index string) (*FSStorage, error) {
 	fsConfig := config.FsConfig{}
-	err := fsConfig.ParseEnv()
-	if err != nil {
-		log.Println("fs.New", err.Error())
-		return nil, err
-	}
+	fsConfig.ParseEnv()
 	s := FSStorage{
 		config: &fsConfig,
 		index:  index,
@@ -34,14 +32,22 @@ type indexDir struct {
 }
 
 func (d indexDir) Open(name string) (http.File, error) {
+	var (
+		file http.File
+		err  error
+	)
 	v := http.Dir(d.dir)
-	file, err := v.Open(name)
-	if err != nil {
+	file, err = v.Open(name)
+
+	if errors.Is(err, fs.ErrNotExist) {
 		file, err = v.Open(d.index)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("file can't be opened %v", err)
 		}
 		return file, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("file can't be opened %v", err)
 	}
 	return file, nil
 }
@@ -50,6 +56,9 @@ func (s *FSStorage) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	dir := indexDir{
 		dir:   s.config.Root,
 		index: s.index,
+	}
+	if strings.HasSuffix(r.URL.Path, "/") {
+		r.URL.Path = "/"
 	}
 	http.FileServer(dir).ServeHTTP(w, r)
 }

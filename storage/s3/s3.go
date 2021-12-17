@@ -2,6 +2,7 @@ package s3
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"path"
@@ -18,8 +19,7 @@ func New(isVaultEnabled bool, vaultPaths string) (*S3Storage, error) {
 	if isVaultEnabled {
 		err := s3Config.GetVaultSecrets(vaultPaths)
 		if err != nil {
-			log.Println("s3.New", err)
-			return nil, err
+			return nil, fmt.Errorf("GetVaultSecrets returned: %v", err)
 		}
 		log.Println("vault secrets have been loaded successfully")
 	}
@@ -38,8 +38,7 @@ func New(isVaultEnabled bool, vaultPaths string) (*S3Storage, error) {
 	conf.Settings[awss3.ConfKeyAccessSecret] = s3Config.AwsSecretAccessKey
 	store, err := cloudstorage.NewStore(conf)
 	if err != nil {
-		log.Println("s3.New", err.Error())
-		return nil, err
+		return nil, fmt.Errorf("s3 initialisation failed: %v", err)
 	}
 	s.store = store
 	return &s, nil
@@ -60,8 +59,7 @@ type object struct {
 func (o *object) getObject(name string) (cloudstorage.Object, error) {
 	obj, err := o.store.Get(context.Background(), path.Join(o.prefix, name))
 	if err != nil {
-		log.Println("s3.getObject", err.Error())
-		return nil, err
+		return nil, fmt.Errorf("s3.getObject failed: %v", err)
 	}
 	return obj, nil
 }
@@ -69,17 +67,14 @@ func (o *object) getObject(name string) (cloudstorage.Object, error) {
 func (o *object) Open(name string) (http.File, error) {
 	obj, err := o.getObject(name)
 	if err != nil {
-		//log.Println("s3.Open", err.Error())
 		obj, err = o.getObject(o.index)
 		if err != nil {
-			log.Println("s3.Open", err.Error())
-			return nil, err
+			return nil, fmt.Errorf("getObject failed: %v", err)
 		}
 	}
 	f, err := obj.Open(cloudstorage.ReadOnly)
 	if err != nil {
-		log.Println("s3.Open", err.Error())
-		return nil, err
+		return nil, fmt.Errorf("obj.Open failed: %v", err)
 	}
 	return f, nil
 }
