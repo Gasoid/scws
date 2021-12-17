@@ -12,8 +12,8 @@ env:
   SCWS_STORAGE: "filesystem"
   JAEGER_DISABLED: true
   SCWS_SETTINGS_VAR_VAR1: "123"
-  AWS_ACCESS_KEY_ID: "test"
-  AWS_SECRET_ACCESS_KEY: "test"
+  SCWS_S3_AWS_ACCESS_KEY_ID: "test"
+  SCWS_S3_AWS_SECRET_ACCESS_KEY: "test"
   # SCWS_FS_ROOT: "/www/"
 
 jobs:
