@@ -4,8 +4,8 @@ import (
 	"net/http"
 )
 
-func newScwsHandler(routes map[string]http.Handler, root string) http.Handler {
-	scwsHandler := &ScwsHandler{routes: routes, rootPath: root}
+func newScwsHandler(routes map[string]http.Handler) http.Handler {
+	scwsHandler := &ScwsHandler{routes: routes}
 	scwsMux := http.DefaultServeMux
 	for k, v := range routes {
 		scwsMux.Handle(k, v)
@@ -15,9 +15,8 @@ func newScwsHandler(routes map[string]http.Handler, root string) http.Handler {
 }
 
 type ScwsHandler struct {
-	routes   map[string]http.Handler
-	rootPath string
-	metrics  func(w ResponseWriter, r *http.Request)
+	routes  map[string]http.Handler
+	metrics func(w ResponseWriter, r *http.Request)
 }
 
 func (scwsHandler *ScwsHandler) Handler(h http.Handler) http.Handler {
@@ -36,12 +35,6 @@ func (scwsHandler *ScwsHandler) Handler(h http.Handler) http.Handler {
 		if _, ok := scwsHandler.routes[r.URL.Path]; ok {
 			writer.Flush()
 			return
-		}
-		if writer.Status() == http.StatusNotFound {
-			writer.reset(w)
-			writer.status = http.StatusOK
-			r.URL.Path = scwsHandler.rootPath
-			h.ServeHTTP(writer, r)
 		}
 		writer.Flush()
 	}

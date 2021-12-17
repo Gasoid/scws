@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -48,7 +49,7 @@ func New() *Config {
 	if c.IsVaultEnabled() {
 		err := vault.Init(c.VaultAddress, c.VaultToken)
 		if err != nil {
-			log.Println("config.New", err.Error())
+			log.Println("config.New:", err.Error())
 		}
 	}
 	return &c
@@ -65,7 +66,7 @@ type config interface {
 	ParseEnv() error
 }
 
-func parseEnv(c config, prefix string) error {
+func parseEnv(c config, prefix string) {
 	t := reflect.ValueOf(c).Elem()
 	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
@@ -85,19 +86,24 @@ func parseEnv(c config, prefix string) error {
 		}
 		f.Set(reflect.ValueOf(value))
 	}
-	return nil
 }
 
 func (c *FsConfig) ParseEnv() error {
-	return parseEnv(c, "FS")
+	parseEnv(c, "FS")
+	return nil
 }
 
 func (c *S3Config) ParseEnv() error {
-	return parseEnv(c, "S3")
+	parseEnv(c, "S3")
+	if c.AwsAccessKeyID == "" || c.AwsSecretAccessKey == "" {
+		return errors.New("couldn't read AWS credentials: AwsAccessKeyID or AwsSecretAccessKey")
+	}
+	return nil
 }
 
 func (c *Config) ParseEnv() error {
-	return parseEnv(c, "")
+	parseEnv(c, "")
+	return nil
 }
 
 func (c *Config) GetAddr() string {
@@ -113,15 +119,14 @@ func (c *S3Config) GetVaultSecrets(paths string) error {
 	for _, p := range pathList {
 		secrets, err := vault.Secrets(p)
 		if err != nil {
-			log.Println("config.GetVaultSecrets", err)
-			return err
+			return fmt.Errorf("couldn't get secrets from vault server: %v", err)
 		}
 		setConfigVars(c, "S3", secrets)
 	}
 	return nil
 }
 
-func setConfigVars(c config, prefix string, secrets map[string]string) error {
+func setConfigVars(c config, prefix string, secrets map[string]string) {
 	t := reflect.ValueOf(c).Elem()
 	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
@@ -143,5 +148,4 @@ func setConfigVars(c config, prefix string, secrets map[string]string) error {
 		}
 
 	}
-	return nil
 }

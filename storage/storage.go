@@ -2,7 +2,6 @@ package storage
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"scws/config"
 	"scws/storage/fs"
@@ -40,9 +39,11 @@ func New(c *config.Config) (*Storage, error) {
 	case S3:
 		s.storage, err = s3.New(c.IsVaultEnabled(), c.VaultPaths)
 	}
+	if err != nil {
+		return nil, fmt.Errorf("couldn't initialize storage: %v", err)
+	}
 	if s.storage == nil {
-		log.Println("couldn't connect to storage")
-		return nil, errors.Wrap(err, "storage.New failed")
+		return nil, errors.New("storage.New has unexpected error")
 	}
 	return &s, nil
 }

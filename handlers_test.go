@@ -9,13 +9,13 @@ import (
 
 func TestNewScwsHandler(t *testing.T) {
 	h := dummyHandler("")
-	testMux := newScwsHandler(map[string]http.Handler{"/": &h}, "/")
+	testMux := newScwsHandler(map[string]http.Handler{"/": &h})
 	assert.NotNil(t, testMux)
 }
 
 func TestScwsHandler(t *testing.T) {
 	h := dummyHandler("")
-	testMux := ScwsHandler{routes: map[string]http.Handler{"/": &h}, rootPath: "/"}
+	testMux := ScwsHandler{routes: map[string]http.Handler{"/": &h}}
 	testHandler := testMux.Handler(&h)
 	assert.NotNil(t, testHandler)
 }
